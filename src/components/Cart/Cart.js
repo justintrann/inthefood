@@ -8,8 +8,12 @@ const Cart = (props) => {
   // Get Data
   const cartData = useContext(CartContext);
   // func
-  const onAddHandler = (items) => {};
-  const onRemoveHandler = (id) => {};
+  const onAddHandler = (items) => {
+    cartData.addItem({ ...items, amount: 1 });
+  };
+  const onRemoveHandler = (id) => {
+    cartData.removeItem(id);
+  };
 
   const cartItems = (
     <ul className={styles["cart-items"]}>

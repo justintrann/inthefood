@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CartContext from "../../../storing/cart-context";
 import CartIcon from "../../Cart/CartIcon";
 import styles from "./HeaderCartButton.module.css";
@@ -9,9 +9,25 @@ const HeaderCartButton = (props) => {
     (currNumber, val) => currNumber + val.amount,
     0
   );
+  // animation bump
+  const [isBump, setIsBump] = useState(0);
+  const animationClass = `${styles.button} ${isBump && styles.bump}`;
+
+  useEffect(() => {
+    if (cartData.items.length === 0) return;
+    setIsBump(1);
+    const timer = setTimeout(() => {
+      setIsBump(0);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [cartData.items]);
+
   // JSX
   return (
-    <button className={styles.button}>
+    <button className={animationClass}>
       <span className={styles.icon}>
         <CartIcon />
       </span>
