@@ -34,18 +34,28 @@ import axios from "axios";
 const AvailableMeals = () => {
   const [dataMeals, setDataMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(1);
+  const [errorValue, setErrorValue] = useState("");
 
   useEffect(() => {
-    axios.get(API_URL).then((res) => {
-      const data = Object.keys(res.data).map((key) => {
-        return { id: key, ...res.data[key] };
+    axios
+      .get(API_URL)
+      .then((res) => {
+        const data = Object.keys(res.data).map((key) => {
+          return { id: key, ...res.data[key] };
+        });
+        setDataMeals(data);
+        setIsLoading(0);
+      })
+      .catch((err) => {
+        setErrorValue("Something went wrong ... " + err.code);
+        setIsLoading(0);
       });
-      setDataMeals(data);
-      setIsLoading(0);
-    });
   }, []);
-
   if (isLoading) return <p className={styles.loading}>Loading ....</p>;
+  if (!isLoading && errorValue !== "")
+    return <p className={styles.loading}>{errorValue}</p>;
+
+  // else return <p className={styles.loading}>Loading ....</p>;
 
   const mealLists = dataMeals.map((meal) => (
     <MealItem key={meal.id} {...meal} />
