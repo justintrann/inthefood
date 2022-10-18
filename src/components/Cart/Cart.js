@@ -5,9 +5,10 @@ import styles from "./Cart.module.css";
 import CartItem from "./CartItem/CartItem";
 import Checkout from "./Checkout/Checkout";
 import axios from "axios";
-import { API_URL } from "../../helper/helperUrl";
+
 const Cart = (props) => {
   const [isCheckout, setIsCheckout] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
   // Get Data
   const cartData = useContext(CartContext);
   // func
@@ -61,6 +62,7 @@ const Cart = (props) => {
   const confirmHandler = (dataInfo) => {
     // send
     try {
+      initialLoadingModal = <p>Loading your data ....</p>;
       axios
         .post(
           "https://react-http-64061-default-rtdb.asia-southeast1.firebasedatabase.app/receipts-bills.json",
@@ -69,13 +71,25 @@ const Cart = (props) => {
             items: cartData.items,
           }
         )
-        .then((res) => console.log(res));
-    } catch (error) {}
+        .then((res) => {
+          if (res.status === 200) setIsSubmit(true);
+          cartData.clearCart();
+          console.log(res);
+          setTimeout(() => {
+            props.onHideCart();
+          }, 4000);
+        })
+        .catch((err) => {
+          throw new Error("Failed in POST" + err);
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
     console.log(dataInfo);
   };
 
-  return (
-    <Modal onHideCart={props.onHideCart}>
+  let initialLoadingModal = (
+    <>
       {cartItems}
       <div className={styles.total}>
         <span>Total: </span>
@@ -85,6 +99,12 @@ const Cart = (props) => {
         <Checkout onConfirm={confirmHandler} onCancel={props.onHideCart} />
       )}
       {!isCheckout && modalButton(checkoutShowHandler)}
+    </>
+  );
+
+  return (
+    <Modal onHideCart={props.onHideCart}>
+      {isSubmit ? <p>Successfully</p> : initialLoadingModal}
     </Modal>
   );
 };
