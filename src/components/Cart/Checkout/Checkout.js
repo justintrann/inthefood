@@ -36,6 +36,16 @@ const Checkout = (props) => {
       postalOk: isFiveChars(valPostal),
       cityOk: isEmpty(valCity),
     });
+
+    const isOk = Object.values(dataOk).every(Boolean);
+    if (!isOk) return alert("Failed");
+
+    props.onConfirm({
+      name: valName,
+      street: valStreet,
+      city: valPostal,
+      postalCode: valCity,
+    });
   };
 
   return (

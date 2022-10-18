@@ -4,7 +4,8 @@ import Modal from "../UI/Modal/Modal";
 import styles from "./Cart.module.css";
 import CartItem from "./CartItem/CartItem";
 import Checkout from "./Checkout/Checkout";
-
+import axios from "axios";
+import { API_URL } from "../../helper/helperUrl";
 const Cart = (props) => {
   const [isCheckout, setIsCheckout] = useState(false);
   // Get Data
@@ -56,6 +57,23 @@ const Cart = (props) => {
     </div>
   );
 
+  // Confirm and send
+  const confirmHandler = (dataInfo) => {
+    // send
+    try {
+      axios
+        .post(
+          "https://react-http-64061-default-rtdb.asia-southeast1.firebasedatabase.app/receipts-bills.json",
+          {
+            usersInfo: dataInfo,
+            items: cartData.items,
+          }
+        )
+        .then((res) => console.log(res));
+    } catch (error) {}
+    console.log(dataInfo);
+  };
+
   return (
     <Modal onHideCart={props.onHideCart}>
       {cartItems}
@@ -63,7 +81,9 @@ const Cart = (props) => {
         <span>Total: </span>
         <span>{cartData.totalAmount.toFixed(2)}</span>
       </div>
-      {isCheckout && <Checkout onCancel={props.onHideCart} />}
+      {isCheckout && (
+        <Checkout onConfirm={confirmHandler} onCancel={props.onHideCart} />
+      )}
       {!isCheckout && modalButton(checkoutShowHandler)}
     </Modal>
   );
